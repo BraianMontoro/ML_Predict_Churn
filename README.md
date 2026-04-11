@@ -40,7 +40,7 @@ O dataset NÃO está versionado no repositório.
 
 Para executar o projeto:
 
-1. Baixe o dataset (ex: Telco Customer Churn)
+1. Baixe o dataset (ex: IBM Telco Customer : https://www.kaggle.com/datasets/yeanzc/telco-customer-churn-ibm-dataset?resource=downloadChurn)
 2. Coloque o arquivo em:
 
 data/raw/
