@@ -1,0 +1,50 @@
+# -------------------------
+# Python
+# -------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environment
+.venv/
+venv/
+
+# -------------------------
+# Jupyter
+# -------------------------
+.ipynb_checkpoints/
+
+# -------------------------
+# MLflow
+# -------------------------
+mlruns/
+
+# -------------------------
+# Model artifacts
+# -------------------------
+models/trained/*
+models/artifacts/*
+
+# -------------------------
+# Data (NÃO VERSIONAR)
+# -------------------------
+data/raw/*
+data/processed/*
+data/external/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/external/.gitkeep
+
+# -------------------------
+# OS / IDE
+# -------------------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# -------------------------
+# Logs
+# -------------------------
+*.log

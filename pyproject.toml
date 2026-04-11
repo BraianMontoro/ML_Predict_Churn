@@ -1,0 +1,44 @@
+[project]
+name = "ml_predict_churn"
+version = "0.1.0"
+description = "Projeto de previsão de churn em telecom com pipeline end-to-end."
+authors = [
+    { name = "Braian Montoro" }
+]
+requires-python = ">=3.11"
+
+dependencies = [
+    "pandas",
+    "numpy",
+    "scikit-learn",
+    "matplotlib",
+    "seaborn",
+    "mlflow",
+    "torch",
+    "fastapi",
+    "uvicorn",
+    "pydantic",
+    "pytest",
+    "ruff",
+    "pandera"
+]
+
+# -------------------------
+# TOOLING
+# -------------------------
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = []
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-q"
+
+[tool.setuptools]
+packages = ["src"]
