@@ -1,116 +1,141 @@
-# 📊 ML_PREDICT_CHURN
+# 📊 ML Predict Churn — Telecom
 
-Projeto de Machine Learning para previsão de churn em uma operadora de telecomunicações, desenvolvido como parte do Tech Challenge (Pós-Tech FIAP).
+Projeto de Machine Learning end-to-end para previsão de churn em uma empresa de telecomunicações, desenvolvido como parte do Tech Challenge (FIAP).
 
 ---
 
 ## 🎯 Objetivo
 
-Construir um pipeline completo de Machine Learning capaz de prever a probabilidade de um cliente cancelar o serviço (churn), utilizando:
-
-- Modelos baseline (Scikit-Learn)
-- Rede Neural MLP (PyTorch)
-- Rastreamento de experimentos com MLflow
-- API de inferência com FastAPI
+Identificar clientes com alta probabilidade de cancelamento (churn), permitindo ações proativas de retenção e redução de perda de receita.
 
 ---
 
-## 🧠 Problema de Negócio
+## 🧠 Problema de ML
 
-A empresa enfrenta alta taxa de cancelamento de clientes.  
-O objetivo é identificar clientes com maior risco de churn para permitir ações de retenção.
+Classificação binária:
 
----
-
-## 📁 Estrutura do Projeto
-
-ML_PREDICT_CHURN/
-├── data/
-├── models/
-├── notebooks/
-├── src/
-├── tests/
-├── docs/
+- 1 → Cliente cancelou (churn)
+- 0 → Cliente permaneceu
 
 ---
 
 ## 📦 Dataset
 
-O dataset NÃO está versionado no repositório.
-Para executar o projeto:
+- **7043 observações**
+- **33 variáveis**
 
-1. Baixe o dataset (ex: IBM Telco Customer: 
-    https://www.kaggle.com/datasets/yeanzc/telco-customer-churn-ibm-dataset?resource=downloadChurn)
-
-2. Coloque o arquivo em:
-    data/raw/
-
----
-
-## ⚙️ Setup do Ambiente
-
-Criar ambiente virtual:
-python -m venv .venv
-
-Ativar ambiente:
-Windows:
-.venv\Scripts\activate
-
-Linux / Mac:
-source .venv/bin/activate
-
-Instalar dependências:
-pip install -r requirements.txt
+### Principais features:
+- Perfil do cliente (Gender, Dependents, Partner)
+- Tempo de relacionamento (Tenure Months)
+- Serviços contratados (Internet, Tech Support, etc.)
+- Financeiro (Monthly Charges, Total Charges)
+- Contrato e pagamento
 
 ---
 
-## 🚀 Executando o Projeto
+## 🧹 Pipeline de Dados
 
-Rodar notebooks:
-jupyter notebook
-
-Rodar API:
-uvicorn src.api.main:app --reload
-
-Acessar documentação:
-http://127.0.0.1:8000/docs
-
-Rodar testes:
-pytest
+- Limpeza e tratamento de tipos
+- Remoção de leakage (`Churn Score`, `Churn Reason`)
+- Encoding com `OneHotEncoder`
+- Escalonamento com `StandardScaler`
+- Pipeline com `ColumnTransformer`
 
 ---
 
-## 📊 Etapas do Projeto
+## 🤖 Modelos Treinados
 
-1. EDA e análise exploratória  
-2. Modelos baseline  
-3. Rede neural MLP (PyTorch)  
-4. Comparação de modelos  
-5. API de inferência  
-6. Testes automatizados  
-7. Documentação e Model Card  
+| Modelo | Accuracy | Precision | Recall | F1 | AUC |
+|--------|---------|----------|--------|----|-----|
+| LogisticRegression | 0.79 | 0.62 | 0.55 | **0.58** | **0.84** |
+| RandomForest | 0.80 | 0.68 | 0.48 | 0.56 | 0.84 |
+| DummyClassifier | 0.73 | 0.00 | 0.00 | 0.00 | - |
 
 ---
 
-## 🧪 Tecnologias
+## 🏆 Modelo Selecionado
+
+### 👉 Logistic Regression
+
+Motivos:
+- Melhor equilíbrio entre precision e recall
+- Maior F1-score
+- Boa interpretabilidade
+- AUC-ROC elevado (~0.84)
+
+---
+
+## ⚙️ Ajuste de Threshold
+
+- Threshold padrão: **0.5**
+- Threshold ajustado: **0.3**
+
+### 🎯 Resultado:
+- Recall aumentado (captura mais churns)
+- Melhor alinhamento com o objetivo de negócio
+
+---
+
+## 📈 Métricas Prioritárias
+
+- AUC-ROC
+- Recall (principal)
+- F1-score
+
+### ⚠ Trade-off:
+- Falso negativo → perda de cliente (alto impacto)
+- Falso positivo → custo de retenção (baixo impacto)
+
+---
+
+## 💸 Impacto de Negócio
+
+- Redução de churn
+- Aumento de retenção
+- Otimização de campanhas de CRM
+- Maior previsibilidade de receita
+
+---
+
+## 🧪 Experiment Tracking
+
+Utilização do **MLflow** para:
+- Registro de experimentos
+- Comparação de modelos
+- Versionamento de métricas
+
+---
+
+## 🛠 Tecnologias
 
 - Python
-- Scikit-Learn
-- PyTorch
+- Pandas / NumPy
+- Scikit-learn
 - MLflow
-- FastAPI
-- Pandera
-- Pytest
-- Ruff
+- Matplotlib / Seaborn
 
 ---
 
-## 📌 Autor
+## 📁 Estrutura do Projeto
+
+```bash
+ML_PREDICT_CHURN/
+├── data/
+│   ├── raw/
+│   └── processed/
+├── notebooks/
+│   ├── 01_eda_baseline.ipynb
+│   └── 02_mlp.ipynb (em desenvolvimento)
+├── src/
+├── models/
+├── tests/
+├── docs/
+│   └── ml_canvas.md
+├── README.md
+```
+---
+
+## 👨‍💻 Autor
 
 Braian Montoro
-
----
-
-## 📄 Licença
-
-Uso educacional.
+Analista de Sistemas | Machine Learning Engineer em formação
