@@ -37,24 +37,22 @@ ML_PREDICT_CHURN/
 ## 📦 Dataset
 
 O dataset NÃO está versionado no repositório.
-
 Para executar o projeto:
 
-1. Baixe o dataset (ex: IBM Telco Customer : https://www.kaggle.com/datasets/yeanzc/telco-customer-churn-ibm-dataset?resource=downloadChurn)
-2. Coloque o arquivo em:
+1. Baixe o dataset (ex: IBM Telco Customer: 
+    https://www.kaggle.com/datasets/yeanzc/telco-customer-churn-ibm-dataset?resource=downloadChurn)
 
-data/raw/
+2. Coloque o arquivo em:
+    data/raw/
 
 ---
 
 ## ⚙️ Setup do Ambiente
 
 Criar ambiente virtual:
-
 python -m venv .venv
 
 Ativar ambiente:
-
 Windows:
 .venv\Scripts\activate
 
@@ -62,7 +60,6 @@ Linux / Mac:
 source .venv/bin/activate
 
 Instalar dependências:
-
 pip install -r requirements.txt
 
 ---
@@ -70,18 +67,15 @@ pip install -r requirements.txt
 ## 🚀 Executando o Projeto
 
 Rodar notebooks:
-
 jupyter notebook
 
 Rodar API:
-
 uvicorn src.api.main:app --reload
 
 Acessar documentação:
 http://127.0.0.1:8000/docs
 
 Rodar testes:
-
 pytest
 
 ---
