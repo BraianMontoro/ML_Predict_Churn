@@ -31,6 +31,8 @@ mlruns/
 # -------------------------
 models/trained/*
 models/artifacts/*
+!models/trained/
+!models/trained/logistic_pipeline.joblib
 
 # -------------------------
 # Data (NÃO VERSIONAR)

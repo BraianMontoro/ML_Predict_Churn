@@ -4,7 +4,6 @@ import joblib
 import pandas as pd
 
 from src.data.schemas import validate_inference_frame
-from src.models.mlp import predict_single_mlp
 from src.utils.paths import LOGISTIC_MODEL_PATH, MLP_MODEL_PATH
 
 logging.basicConfig(
@@ -53,6 +52,15 @@ def predict_single(input_data: dict, model_name: str = "logistic"):
         if model_name == "logistic":
             return predict_single_logistic(input_data)
         if model_name == "mlp":
+            # Lazy import keeps the default API startup lighter for cloud deploys.
+            try:
+                from src.models.mlp import predict_single_mlp
+            except ImportError as exc:
+                raise RuntimeError(
+                    "Dependencias da MLP nao estao disponiveis neste ambiente. "
+                    "Use model_name=logistic ou instale os pacotes de treino."
+                ) from exc
+
             return predict_single_mlp(input_data, MLP_MODEL_PATH)
         raise ValueError(f"Modelo inválido: {model_name}")
     except Exception as exc:

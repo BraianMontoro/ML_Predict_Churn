@@ -88,6 +88,14 @@ python -m pip install -e .
 pip install -r requirements.txt
 ```
 
+### Opcao 3
+
+Para ambiente local de treino, notebooks e desenvolvimento:
+
+```powershell
+pip install -r requirements-dev.txt
+```
+
 ## Comandos Principais
 
 ```powershell
@@ -210,6 +218,8 @@ python -m mlflow ui --backend-store-uri ./mlruns
 
 - O backend local do MLflow em filesystem funciona para o desafio, mas pode ser migrado depois para SQLite ou backend remoto.
 - O deploy em nuvem continua como extensao natural para o bonus da entrega.
+- Para deploy da API em App Service, `requirements.txt` foi mantido enxuto para runtime. Dependencias de treino e notebooks ficam em `requirements-dev.txt`.
+- O endpoint `/predict` em nuvem exige que o arquivo `models/trained/logistic_pipeline.joblib` esteja versionado no repositÃ³rio.
 
 ## Autor
 
