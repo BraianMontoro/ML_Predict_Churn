@@ -4,6 +4,10 @@
 
 name: Build and deploy Python app to Azure Web App - ml-predict-churn
 
+concurrency:
+  group: azure-appservice-ml-predict-churn
+  cancel-in-progress: true
+
 on:
   push:
     branches:
@@ -73,4 +77,5 @@ jobs:
         with:
           app-name: 'ml-predict-churn'
           slot-name: 'Production'
+          package: .
           
