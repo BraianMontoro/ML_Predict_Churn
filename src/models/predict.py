@@ -17,13 +17,13 @@ def load_logistic_model():
     logger.info("Carregando modelo salvo em: %s", LOGISTIC_MODEL_PATH)
     if not LOGISTIC_MODEL_PATH.exists():
         raise FileNotFoundError(
-            f"Modelo logístico não encontrado em {LOGISTIC_MODEL_PATH}. Execute o treino primeiro."
+            f"Modelo logistico nao encontrado em {LOGISTIC_MODEL_PATH}. Execute o treino primeiro."
         )
     return joblib.load(LOGISTIC_MODEL_PATH)
 
 
 def predict_single_logistic(input_data: dict):
-    logger.info("Iniciando inferência com regressão logística")
+    logger.info("Iniciando inferencia com regressao logistica")
     logger.info("Payload recebido: %s", input_data)
 
     model = load_logistic_model()
@@ -36,7 +36,7 @@ def predict_single_logistic(input_data: dict):
     probability = model.predict_proba(df)[0][1]
 
     logger.info(
-        "Inferência concluída com sucesso | prediction=%s | churn_probability=%.4f",
+        "Inferencia concluida com sucesso | prediction=%s | churn_probability=%.4f",
         int(prediction),
         float(probability),
     )
@@ -62,7 +62,7 @@ def predict_single(input_data: dict, model_name: str = "logistic"):
                 ) from exc
 
             return predict_single_mlp(input_data, MLP_MODEL_PATH)
-        raise ValueError(f"Modelo inválido: {model_name}")
+        raise ValueError(f"Modelo invalido: {model_name}")
     except Exception as exc:
-        logger.exception("Erro durante a inferência: %s", str(exc))
+        logger.exception("Erro durante a inferencia: %s", str(exc))
         raise

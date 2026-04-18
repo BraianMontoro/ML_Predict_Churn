@@ -32,6 +32,7 @@ ML_PREDICT_CHURN/
 |-- Makefile
 |-- pyproject.toml
 |-- requirements.txt
+|-- requirements-dev.txt
 ```
 
 ## Modelos do Projeto
@@ -72,15 +73,30 @@ A MLP foi industrializada no projeto por ser o modelo central exigido pelo desaf
 
 - Python 3.11+
 - ambiente virtual ativo
+- arquivo `data/raw/Telco_customer_churn.xlsx` disponivel localmente
 - dependencias instaladas
+
+## Dataset
+
+O projeto utiliza o dataset Telco Customer Churn em formato Excel.
+
+Para reproduzir o treino do zero:
+
+1. obtenha o arquivo `Telco_customer_churn.xlsx`
+2. salve em `data/raw/`
+3. mantenha exatamente esse nome de arquivo
+
+O dataset bruto nao e versionado no Git por tamanho e por boas praticas de projetos de ML.
 
 ## Instalacao
 
 ### Opcao 1
 
 ```powershell
-python -m pip install -e .
+python -m pip install -e ".[dev,train]"
 ```
+
+Instala o projeto com as dependencias de desenvolvimento e treinamento.
 
 ### Opcao 2
 
@@ -88,23 +104,37 @@ python -m pip install -e .
 pip install -r requirements.txt
 ```
 
-### Opcao 3
+Instala apenas o runtime da API a partir do `pyproject.toml`.
 
-Para ambiente local de treino, notebooks e desenvolvimento:
+### Opcao 3
 
 ```powershell
 pip install -r requirements-dev.txt
 ```
 
+Arquivo de conveniencia para instalar o projeto com extras de desenvolvimento e treino.
+
+## Dependencias
+
+O `pyproject.toml` e a fonte canonica de dependencias, lint e configuracao de testes.
+
+Arquivos auxiliares:
+
+- `requirements.txt`: runtime enxuto da API
+- `requirements-dev.txt`: instalacao local com extras de treino e desenvolvimento
+
 ## Comandos Principais
 
 ```powershell
+make install
+make install-runtime
+make install-dev
 make lint
 make test
+make run
 make train-logistic
 make train-baselines
 make train-mlp
-make run-api
 make mlflow-ui
 ```
 
@@ -178,6 +208,11 @@ curl -X POST "http://127.0.0.1:8000/predict?model_name=mlp" ^
   -d "{\"count\":1,\"country\":\"United States\",\"state\":\"California\",\"city\":\"Los Angeles\",\"zip_code\":\"90001\",\"lat_long\":\"33.973616, -118.24902\",\"latitude\":33.973616,\"longitude\":-118.24902,\"gender\":\"Male\",\"senior_citizen\":0,\"partner\":\"Yes\",\"dependents\":\"No\",\"tenure_months\":12,\"phone_service\":\"Yes\",\"multiple_lines\":\"No\",\"internet_service\":\"Fiber optic\",\"online_security\":\"No\",\"online_backup\":\"Yes\",\"device_protection\":\"No\",\"tech_support\":\"No\",\"streaming_tv\":\"Yes\",\"streaming_movies\":\"Yes\",\"contract\":\"Month-to-month\",\"paperless_billing\":\"Yes\",\"payment_method\":\"Electronic check\",\"Monthly Charges\":79.9,\"total_charges\":958.8}"
 ```
 
+Observacao:
+
+- a rota `model_name=mlp` exige que o artefato `models/trained/mlp_bundle.joblib` exista no ambiente
+- no repositorio versionado, o artefato garantido para inferencia imediata e o baseline logistico
+
 ## Qualidade e Validacao
 
 O projeto possui:
@@ -218,8 +253,8 @@ python -m mlflow ui --backend-store-uri ./mlruns
 
 - O backend local do MLflow em filesystem funciona para o desafio, mas pode ser migrado depois para SQLite ou backend remoto.
 - O deploy em nuvem continua como extensao natural para o bonus da entrega.
-- Para deploy da API em App Service, `requirements.txt` foi mantido enxuto para runtime. Dependencias de treino e notebooks ficam em `requirements-dev.txt`.
-- O endpoint `/predict` em nuvem exige que o arquivo `models/trained/logistic_pipeline.joblib` esteja versionado no repositÃ³rio.
+- Para deploy da API em App Service, `requirements.txt` instala o runtime da aplicacao via `pyproject.toml`.
+- O endpoint `/predict` em nuvem exige que o arquivo `models/trained/logistic_pipeline.joblib` esteja versionado no repositorio.
 
 ## Autor
 

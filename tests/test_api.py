@@ -38,6 +38,7 @@ PAYLOAD = {
     "total_charges": 958.8,
 }
 
+
 def test_health():
     response = client.get("/health")
     assert response.status_code == 200
@@ -59,7 +60,7 @@ def test_predict():
 
 def test_predict_mlp():
     if not Path(MLP_MODEL_PATH).exists():
-        pytest.skip("Bundle da MLP ainda não foi treinado no ambiente local.")
+        pytest.skip("Bundle da MLP ainda nao foi treinado no ambiente local.")
 
     response = client.post("/predict?model_name=mlp", json=PAYLOAD)
 

@@ -16,16 +16,24 @@ dependencies = [
     "numpy",
     "openpyxl",
     "scikit-learn",
-    "matplotlib",
-    "seaborn",
-    "mlflow",
-    "torch",
     "fastapi",
     "uvicorn",
     "pydantic",
+    "pandera"
+]
+
+[project.optional-dependencies]
+dev = [
+    "httpx",
+    "jupyter",
     "pytest",
     "ruff",
-    "pandera"
+]
+train = [
+    "matplotlib",
+    "mlflow",
+    "seaborn",
+    "torch",
 ]
 
 [tool.ruff]

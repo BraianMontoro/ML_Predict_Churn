@@ -1,8 +1,1 @@
-pandas
-numpy
-openpyxl
-scikit-learn
-fastapi
-uvicorn
-pandera
-pydantic
+-e .

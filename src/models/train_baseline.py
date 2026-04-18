@@ -39,14 +39,17 @@ def set_seed(seed: int = RANDOM_STATE) -> None:
     random.seed(seed)
     np.random.seed(seed)
 
+
 def build_pipeline(X):
     preprocessor, _, _ = build_preprocessor(X)
     model = LogisticRegression(max_iter=1000, random_state=RANDOM_STATE)
 
-    pipeline = Pipeline([
-        ("preprocessor", preprocessor),
-        ("model", model),
-    ])
+    pipeline = Pipeline(
+        [
+            ("preprocessor", preprocessor),
+            ("model", model),
+        ]
+    )
 
     return pipeline
 
@@ -68,7 +71,7 @@ def main():
 
     pipeline = build_pipeline(X)
 
-    logger.info("Executando validação cruzada estratificada")
+    logger.info("Executando validacao cruzada estratificada")
     cv = StratifiedKFold(n_splits=N_SPLITS, shuffle=True, random_state=RANDOM_STATE)
     scoring = ["accuracy", "precision", "recall", "f1", "roc_auc"]
 
@@ -90,7 +93,7 @@ def main():
         "cv_auc_mean": float(np.mean(cv_results["test_roc_auc"])),
     }
 
-    logger.info("Métricas médias da CV: %s", cv_metrics)
+    logger.info("Metricas medias da CV: %s", cv_metrics)
 
     X_train, X_test, y_train, y_test = train_test_split(
         X,
@@ -114,19 +117,21 @@ def main():
         "auc": roc_auc_score(y_test, y_proba),
     }
 
-    logger.info("Métricas no holdout: %s", holdout_metrics)
+    logger.info("Metricas no holdout: %s", holdout_metrics)
 
     mlflow.set_tracking_uri(MLRUNS_DIR.resolve().as_uri())
     mlflow.set_experiment(EXPERIMENT_NAME)
     with mlflow.start_run(run_name="logistic_regression_stage3"):
-        mlflow.log_params({
-            "model": "LogisticRegression",
-            "test_size": TEST_SIZE,
-            "random_state": RANDOM_STATE,
-            "cv_n_splits": N_SPLITS,
-            "cv_n_jobs": CV_N_JOBS,
-            **dataset_metadata,
-        })
+        mlflow.log_params(
+            {
+                "model": "LogisticRegression",
+                "test_size": TEST_SIZE,
+                "random_state": RANDOM_STATE,
+                "cv_n_splits": N_SPLITS,
+                "cv_n_jobs": CV_N_JOBS,
+                **dataset_metadata,
+            }
+        )
         mlflow.log_metrics(cv_metrics)
         mlflow.log_metrics(holdout_metrics)
         mlflow.sklearn.log_model(pipeline, name="model")

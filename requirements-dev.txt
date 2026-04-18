@@ -1,15 +1,1 @@
-pandas
-numpy
-openpyxl
-scikit-learn
-fastapi
-uvicorn
-pandera
-pydantic
-matplotlib
-seaborn
-jupyter
-mlflow
-torch
-pytest
-ruff
+-e .[dev,train]
