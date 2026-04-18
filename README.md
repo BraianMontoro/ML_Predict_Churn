@@ -144,4 +144,7 @@ ML_PREDICT_CHURN/
 ## 👨‍💻 Autor
 
 Braian Montoro
-Analista de Sistemas | Machine Learning Engineer em formação
+Analista de Sistemas | ML Engineer
+
+###GitHub: https://github.com/BraianMontoro/ML_Predict_Churn
+###Linkedin: 

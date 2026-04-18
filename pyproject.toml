@@ -23,13 +23,16 @@ dependencies = [
     "pandera"
 ]
 
-# -------------------------
-# TOOLING
-# -------------------------
-
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+exclude = [
+    ".venv",
+    "__pycache__",
+    "mlruns",
+    "models",
+    "notebooks",
+]
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]
