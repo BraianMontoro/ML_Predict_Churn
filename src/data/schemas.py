@@ -1,5 +1,6 @@
 import pandas as pd
 import pandera.pandas as pa
+from pandas.api.types import is_object_dtype, is_string_dtype
 
 from src.data.preprocess import TARGET_COL, normalize_column_names
 
@@ -112,14 +113,16 @@ def _prepare_frame_for_validation(df: pd.DataFrame) -> pd.DataFrame:
 
     if "senior_citizen" in prepared.columns:
         senior_series = prepared["senior_citizen"]
-        if senior_series.dtype == "string" or senior_series.dtype == object:
+        if is_object_dtype(senior_series) or is_string_dtype(senior_series):
             normalized = senior_series.astype("string").str.strip().str.lower()
-            prepared["senior_citizen"] = normalized.map({
-                "yes": 1,
-                "no": 0,
-                "1": 1,
-                "0": 0,
-            }).fillna(senior_series)
+            prepared["senior_citizen"] = normalized.map(
+                {
+                    "yes": 1,
+                    "no": 0,
+                    "1": 1,
+                    "0": 0,
+                }
+            ).fillna(senior_series)
 
     existing_numeric_columns = [column for column in NUMERIC_COLUMNS if column in prepared.columns]
     for column in existing_numeric_columns:

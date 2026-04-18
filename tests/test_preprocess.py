@@ -22,6 +22,22 @@ def test_basic_cleaning_normalizes_columns_and_types():
     assert cleaned.loc[0, "total_charges"] == 958.8
 
 
+def test_basic_cleaning_handles_pandas_string_dtype():
+    raw = pd.DataFrame(
+        {
+            "Senior Citizen": pd.Series(["Yes"], dtype="string"),
+            "Monthly Charges": pd.Series(["79.9"], dtype="string"),
+            "Total Charges": pd.Series(["958.8"], dtype="string"),
+        }
+    )
+
+    cleaned = basic_cleaning(raw)
+
+    assert cleaned.loc[0, "senior_citizen"] == 1
+    assert cleaned.loc[0, "monthly_charges"] == 79.9
+    assert cleaned.loc[0, "total_charges"] == 958.8
+
+
 def test_feature_pipeline_treats_zip_code_as_categorical():
     features = pd.DataFrame([
         {
