@@ -1,7 +1,11 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "ml_predict_churn"
 version = "0.1.0"
-description = "Projeto de previsão de churn em telecom com pipeline end-to-end."
+description = "Projeto de previsao de churn em telecom com pipeline end-to-end."
 authors = [
     { name = "Braian Montoro" }
 ]
@@ -10,6 +14,7 @@ requires-python = ">=3.11"
 dependencies = [
     "pandas",
     "numpy",
+    "openpyxl",
     "scikit-learn",
     "matplotlib",
     "seaborn",
@@ -28,6 +33,7 @@ line-length = 100
 target-version = "py311"
 exclude = [
     ".venv",
+    ".cache",
     "__pycache__",
     "mlruns",
     "models",
@@ -41,7 +47,11 @@ ignore = []
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
-addopts = "-q"
+addopts = "-q -p no:cacheprovider"
 
 [tool.setuptools]
-packages = ["src"]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]

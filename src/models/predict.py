@@ -3,46 +3,58 @@ import logging
 import joblib
 import pandas as pd
 
-from src.utils.paths import TRAINED_MODELS_DIR
-
-MODEL_PATH = TRAINED_MODELS_DIR / "logistic_pipeline.joblib"
+from src.data.schemas import validate_inference_frame
+from src.models.mlp import predict_single_mlp
+from src.utils.paths import LOGISTIC_MODEL_PATH, MLP_MODEL_PATH
 
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s | %(levelname)s | %(message)s"
+    format="%(asctime)s | %(levelname)s | %(message)s",
 )
-
 logger = logging.getLogger(__name__)
 
-def load_model():
-    logger.info("Carregando modelo salvo em: %s", MODEL_PATH)
-    return joblib.load(MODEL_PATH)
 
-def predict_single(input_data: dict):
-    try:
-        logger.info("Iniciando inferência")
-        logger.info("Payload recebido: %s", input_data)
-
-        model = load_model()
-        df = pd.DataFrame([input_data])
-
-        logger.info("Colunas recebidas pela API: %s", df.columns.tolist())
-        logger.info("Quantidade de colunas recebidas: %d", len(df.columns))
-
-        prediction = model.predict(df)[0]
-        probability = model.predict_proba(df)[0][1]
-
-        logger.info(
-            "Inferência concluída com sucesso | prediction=%s | churn_probability=%.4f",
-            int(prediction),
-            float(probability)
+def load_logistic_model():
+    logger.info("Carregando modelo salvo em: %s", LOGISTIC_MODEL_PATH)
+    if not LOGISTIC_MODEL_PATH.exists():
+        raise FileNotFoundError(
+            f"Modelo logístico não encontrado em {LOGISTIC_MODEL_PATH}. Execute o treino primeiro."
         )
+    return joblib.load(LOGISTIC_MODEL_PATH)
 
-        return {
-            "prediction": int(prediction),
-            "churn_probability": float(probability)
-        }
 
-    except Exception as e:
-        logger.exception("Erro durante a inferência: %s", str(e))
+def predict_single_logistic(input_data: dict):
+    logger.info("Iniciando inferência com regressão logística")
+    logger.info("Payload recebido: %s", input_data)
+
+    model = load_logistic_model()
+    df = validate_inference_frame(pd.DataFrame([input_data]))
+
+    logger.info("Colunas recebidas pela API: %s", df.columns.tolist())
+    logger.info("Quantidade de colunas recebidas: %d", len(df.columns))
+
+    prediction = model.predict(df)[0]
+    probability = model.predict_proba(df)[0][1]
+
+    logger.info(
+        "Inferência concluída com sucesso | prediction=%s | churn_probability=%.4f",
+        int(prediction),
+        float(probability),
+    )
+
+    return {
+        "prediction": int(prediction),
+        "churn_probability": float(probability),
+    }
+
+
+def predict_single(input_data: dict, model_name: str = "logistic"):
+    try:
+        if model_name == "logistic":
+            return predict_single_logistic(input_data)
+        if model_name == "mlp":
+            return predict_single_mlp(input_data, MLP_MODEL_PATH)
+        raise ValueError(f"Modelo inválido: {model_name}")
+    except Exception as exc:
+        logger.exception("Erro durante a inferência: %s", str(exc))
         raise

@@ -1,11 +1,23 @@
 install:
-	pip install -r requirements.txt
+	python -m pip install -e .
 
 lint:
-	ruff check .
+	python -m ruff check .
 
 test:
-	pytest -q
+	python -m pytest -q
 
 run-api:
-	uvicorn src.api.main:app --reload
+	python -m uvicorn src.api.main:app --reload
+
+train-logistic:
+	python -m src.models.train_baseline
+
+train-baselines:
+	python -m src.models.train_all_baselines
+
+train-mlp:
+	python -m src.models.train_mlp
+
+mlflow-ui:
+	python -m mlflow ui --backend-store-uri ./mlruns

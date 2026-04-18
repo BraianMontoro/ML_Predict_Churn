@@ -5,8 +5,6 @@ import joblib
 import mlflow
 import mlflow.sklearn
 import numpy as np
-from sklearn.compose import ColumnTransformer
-from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
     accuracy_score,
@@ -17,16 +15,18 @@ from sklearn.metrics import (
 )
 from sklearn.model_selection import StratifiedKFold, cross_validate, train_test_split
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-from src.data.load_data import load_telco_data
+from src.data.feature_pipeline import build_preprocessor
+from src.data.load_data import get_telco_data_metadata, load_telco_data
 from src.data.preprocess import basic_cleaning, split_features_target
-from src.utils.paths import TRAINED_MODELS_DIR
+from src.data.schemas import validate_training_data
+from src.utils.paths import LOGISTIC_MODEL_PATH, MLRUNS_DIR, TRAINED_MODELS_DIR
 
 EXPERIMENT_NAME = "telco_churn_baselines"
 RANDOM_STATE = 42
 TEST_SIZE = 0.2
 N_SPLITS = 5
+CV_N_JOBS = 1
 
 logging.basicConfig(
     level=logging.INFO,
@@ -39,28 +39,8 @@ def set_seed(seed: int = RANDOM_STATE) -> None:
     random.seed(seed)
     np.random.seed(seed)
 
-
 def build_pipeline(X):
-    categorical_cols = X.select_dtypes(include=["object", "category"]).columns.tolist()
-    numerical_cols = X.select_dtypes(
-        include=["int64", "float64", "int32", "float32"]
-    ).columns.tolist()
-
-    numeric_pipeline = Pipeline([
-        ("imputer", SimpleImputer(strategy="median")),
-        ("scaler", StandardScaler()),
-    ])
-
-    categorical_pipeline = Pipeline([
-        ("imputer", SimpleImputer(strategy="most_frequent")),
-        ("onehot", OneHotEncoder(handle_unknown="ignore")),
-    ])
-
-    preprocessor = ColumnTransformer([
-        ("num", numeric_pipeline, numerical_cols),
-        ("cat", categorical_pipeline, categorical_cols),
-    ])
-
+    preprocessor, _, _ = build_preprocessor(X)
     model = LogisticRegression(max_iter=1000, random_state=RANDOM_STATE)
 
     pipeline = Pipeline([
@@ -74,11 +54,14 @@ def build_pipeline(X):
 def main():
     set_seed(RANDOM_STATE)
     TRAINED_MODELS_DIR.mkdir(parents=True, exist_ok=True)
+    MLRUNS_DIR.mkdir(parents=True, exist_ok=True)
 
     logger.info("Carregando dataset")
     df = load_telco_data()
+    dataset_metadata = get_telco_data_metadata()
     df = basic_cleaning(df)
     X, y = split_features_target(df)
+    X, y = validate_training_data(X, y)
 
     logger.info("Colunas usadas no treino: %s", X.columns.tolist())
     logger.info("Quantidade de colunas: %d", len(X.columns))
@@ -95,7 +78,7 @@ def main():
         y,
         cv=cv,
         scoring=scoring,
-        n_jobs=-1,
+        n_jobs=CV_N_JOBS,
         return_train_score=False,
     )
 
@@ -133,6 +116,7 @@ def main():
 
     logger.info("Métricas no holdout: %s", holdout_metrics)
 
+    mlflow.set_tracking_uri(MLRUNS_DIR.resolve().as_uri())
     mlflow.set_experiment(EXPERIMENT_NAME)
     with mlflow.start_run(run_name="logistic_regression_stage3"):
         mlflow.log_params({
@@ -140,15 +124,16 @@ def main():
             "test_size": TEST_SIZE,
             "random_state": RANDOM_STATE,
             "cv_n_splits": N_SPLITS,
+            "cv_n_jobs": CV_N_JOBS,
+            **dataset_metadata,
         })
         mlflow.log_metrics(cv_metrics)
         mlflow.log_metrics(holdout_metrics)
-        mlflow.sklearn.log_model(pipeline, artifact_path="model")
+        mlflow.sklearn.log_model(pipeline, name="model")
 
-    model_path = TRAINED_MODELS_DIR / "logistic_pipeline.joblib"
-    joblib.dump(pipeline, model_path)
+    joblib.dump(pipeline, LOGISTIC_MODEL_PATH)
 
-    logger.info("Modelo salvo em: %s", model_path)
+    logger.info("Modelo salvo em: %s", LOGISTIC_MODEL_PATH)
 
 
 if __name__ == "__main__":

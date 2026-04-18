@@ -1,150 +1,219 @@
-# 📊 ML Predict Churn — Telecom
+# ML Predict Churn - Telecom
 
-Projeto de Machine Learning end-to-end para previsão de churn em uma empresa de telecomunicações, desenvolvido como parte do Tech Challenge (FIAP).
+Projeto de Machine Learning end-to-end para previsao de churn em telecom, desenvolvido para o Tech Challenge da FIAP.
 
----
+## Objetivo
 
-## 🎯 Objetivo
+Identificar clientes com maior probabilidade de cancelamento para apoiar acoes de retencao, priorizacao comercial e reducao de perda de receita.
 
-Identificar clientes com alta probabilidade de cancelamento (churn), permitindo ações proativas de retenção e redução de perda de receita.
+## Escopo da Entrega
 
----
+O repositorio cobre:
 
-## 🧠 Problema de ML
+- EDA e baselines
+- MLP em PyTorch com batching e early stopping
+- tracking de experimentos com MLflow
+- API FastAPI para inferencia
+- testes automatizados
+- Model Card
+- documentacao de arquitetura e monitoramento
 
-Classificação binária:
+## Estrutura do Projeto
 
-- 1 → Cliente cancelou (churn)
-- 0 → Cliente permaneceu
-
----
-
-## 📦 Dataset
-
-- **7043 observações**
-- **33 variáveis**
-
-### Principais features:
-- Perfil do cliente (Gender, Dependents, Partner)
-- Tempo de relacionamento (Tenure Months)
-- Serviços contratados (Internet, Tech Support, etc.)
-- Financeiro (Monthly Charges, Total Charges)
-- Contrato e pagamento
-
----
-
-## 🧹 Pipeline de Dados
-
-- Limpeza e tratamento de tipos
-- Remoção de leakage (`Churn Score`, `Churn Reason`)
-- Encoding com `OneHotEncoder`
-- Escalonamento com `StandardScaler`
-- Pipeline com `ColumnTransformer`
-
----
-
-## 🤖 Modelos Treinados
-
-| Modelo                     | Accuracy | Precision | Recall | F1 | AUC |
-|---------------------------|---------|----------|--------|----|-----|
-| Logistic Regression (0.3) | 0.79    | 0.54     | 0.74   | 0.623 | **0.84** |
-| MLP (PyTorch)             | 0.76    | 0.54     | 0.74   | **0.625** | 0.83 |
-| Random Forest             | 0.80    | **0.68** | 0.48   | 0.56 | 0.84 |
-| Dummy Classifier          | 0.73    | 0.00     | 0.00   | 0.00 | - |
-
----
-
-## 🏆 Modelo Selecionado
-
-### 👉 Logistic Regression (threshold = 0.3)
-
-Motivos:
-- Melhor equilíbrio entre precision e recall
-- Alto recall, essencial para identificar clientes em risco de churn
-- AUC-ROC elevado (~0.84)
-- Desempenho equivalente à MLP com menor complexidade
-- Maior interpretabilidade e facilidade de manutenção
-
-Apesar da MLP apresentar desempenho muito próximo (com leve ganho em F1-score), não houve melhoria significativa que justificasse o aumento de complexidade do modelo.
-
-Dessa forma, a Regressão Logística foi mantida como modelo principal.
-
----
-
-## ⚙️ Ajuste de Threshold
-
-- Threshold padrão: **0.5**
-- Threshold ajustado: **0.3**
-
-### 🎯 Resultado:
-- Recall aumentado (captura mais churns)
-- Melhor alinhamento com o objetivo de negócio
-
----
-
-## 📈 Métricas Prioritárias
-
-- AUC-ROC
-- Recall (principal)
-- F1-score
-
-### ⚠ Trade-off:
-- Falso negativo → perda de cliente (alto impacto)
-- Falso positivo → custo de retenção (baixo impacto)
-
----
-
-## 💸 Impacto de Negócio
-
-- Redução de churn
-- Aumento de retenção
-- Otimização de campanhas de CRM
-- Maior previsibilidade de receita
-
----
-
-## 🧪 Experiment Tracking
-
-Utilização do **MLflow** para:
-- Registro de experimentos
-- Comparação de modelos
-- Versionamento de métricas
-
----
-
-## 🛠 Tecnologias
-
-- Python
-- Pandas / NumPy
-- Scikit-learn
-- MLflow
-- Matplotlib / Seaborn
-
----
-
-## 📁 Estrutura do Projeto
-
-```bash
+```text
 ML_PREDICT_CHURN/
-├── data/
-│   ├── raw/
-│   └── processed/
-├── notebooks/
-│   ├── 01_eda_baseline.ipynb
-│   └── 02_mlp.ipynb (em desenvolvimento)
-├── src/
-├── models/
-├── tests/
-├── docs/
-│   └── ml_canvas.md
-├── README.md
+|-- data/
+|-- docs/
+|-- mlruns/
+|-- models/
+|-- notebooks/
+|-- src/
+|-- tests/
+|-- Makefile
+|-- pyproject.toml
+|-- requirements.txt
 ```
----
 
-## 👨‍💻 Autor
+## Modelos do Projeto
 
-Braian Montoro
-Analista de Sistemas | ML Engineer
+### Baselines
 
-###GitHub: https://github.com/BraianMontoro/ML_Predict_Churn
-###Linkedin: 
+- Dummy Classifier
+- Logistic Regression
+- Random Forest
+
+### Modelo central
+
+- MLP em PyTorch
+
+## Resultados de Referencia
+
+As metricas abaixo refletem os artefatos mais recentes gerados localmente:
+
+| Modelo | Accuracy | Precision | Recall | F1 | AUC |
+|---|---:|---:|---:|---:|---:|
+| Logistic Regression | 0.781 | 0.602 | 0.513 | 0.554 | 0.827 |
+| MLP (PyTorch) | 0.772 | 0.557 | 0.695 | 0.618 | 0.841 |
+
+Os baselines adicionais (`DummyClassifier` e `RandomForestClassifier`) ficam registrados no MLflow para comparacao historica.
+
+## Modelo Selecionado para Producao
+
+O baseline de producao continua sendo a Regressao Logistica, porque oferece:
+
+- interpretabilidade maior
+- operacao mais simples
+- desempenho competitivo
+- facilidade de manutencao
+
+A MLP foi industrializada no projeto por ser o modelo central exigido pelo desafio e pode ser utilizada via API com `model_name=mlp`.
+
+## Requisitos
+
+- Python 3.11+
+- ambiente virtual ativo
+- dependencias instaladas
+
+## Instalacao
+
+### Opcao 1
+
+```powershell
+python -m pip install -e .
+```
+
+### Opcao 2
+
+```powershell
+pip install -r requirements.txt
+```
+
+## Comandos Principais
+
+```powershell
+make lint
+make test
+make train-logistic
+make train-baselines
+make train-mlp
+make run-api
+make mlflow-ui
+```
+
+## Treinamento
+
+### Regressao Logistica
+
+```powershell
+python -m src.models.train_baseline
+```
+
+Artefato salvo em:
+
+- `models/trained/logistic_pipeline.joblib`
+
+### Baselines comparativos
+
+```powershell
+python -m src.models.train_all_baselines
+```
+
+Artefatos auxiliares salvos em:
+
+- `models/artifacts/dummy_classifier.joblib`
+- `models/artifacts/logistic_regression.joblib`
+- `models/artifacts/random_forest.joblib`
+
+### MLP
+
+```powershell
+python -m src.models.train_mlp
+```
+
+Artefatos salvos em:
+
+- `models/trained/mlp_bundle.joblib`
+- `models/artifacts/mlp_training_history.json`
+
+## API
+
+Suba a API com:
+
+```powershell
+python -m uvicorn src.api.main:app --reload
+```
+
+### Endpoints
+
+- `GET /health`
+- `POST /predict`
+
+### Header de observabilidade
+
+Todas as respostas incluem:
+
+- `X-Process-Time-Ms`
+
+### Exemplo de inferencia com o baseline logistico
+
+```powershell
+curl -X POST "http://127.0.0.1:8000/predict" ^
+  -H "Content-Type: application/json" ^
+  -d "{\"count\":1,\"country\":\"United States\",\"state\":\"California\",\"city\":\"Los Angeles\",\"zip_code\":\"90001\",\"lat_long\":\"33.973616, -118.24902\",\"latitude\":33.973616,\"longitude\":-118.24902,\"gender\":\"Male\",\"senior_citizen\":0,\"partner\":\"Yes\",\"dependents\":\"No\",\"tenure_months\":12,\"phone_service\":\"Yes\",\"multiple_lines\":\"No\",\"internet_service\":\"Fiber optic\",\"online_security\":\"No\",\"online_backup\":\"Yes\",\"device_protection\":\"No\",\"tech_support\":\"No\",\"streaming_tv\":\"Yes\",\"streaming_movies\":\"Yes\",\"contract\":\"Month-to-month\",\"paperless_billing\":\"Yes\",\"payment_method\":\"Electronic check\",\"Monthly Charges\":79.9,\"total_charges\":958.8}"
+```
+
+### Exemplo de inferencia com a MLP
+
+```powershell
+curl -X POST "http://127.0.0.1:8000/predict?model_name=mlp" ^
+  -H "Content-Type: application/json" ^
+  -d "{\"count\":1,\"country\":\"United States\",\"state\":\"California\",\"city\":\"Los Angeles\",\"zip_code\":\"90001\",\"lat_long\":\"33.973616, -118.24902\",\"latitude\":33.973616,\"longitude\":-118.24902,\"gender\":\"Male\",\"senior_citizen\":0,\"partner\":\"Yes\",\"dependents\":\"No\",\"tenure_months\":12,\"phone_service\":\"Yes\",\"multiple_lines\":\"No\",\"internet_service\":\"Fiber optic\",\"online_security\":\"No\",\"online_backup\":\"Yes\",\"device_protection\":\"No\",\"tech_support\":\"No\",\"streaming_tv\":\"Yes\",\"streaming_movies\":\"Yes\",\"contract\":\"Month-to-month\",\"paperless_billing\":\"Yes\",\"payment_method\":\"Electronic check\",\"Monthly Charges\":79.9,\"total_charges\":958.8}"
+```
+
+## Qualidade e Validacao
+
+O projeto possui:
+
+- validacao HTTP com Pydantic
+- validacao tabular com Pandera
+- smoke test
+- testes de schema
+- testes da API
+- testes unitarios de preprocessamento
+- lint com Ruff
+
+## MLflow
+
+Os runs sao registrados localmente em `mlruns/`.
+
+Cada experimento registra:
+
+- parametros do modelo
+- metricas de avaliacao
+- artefatos gerados
+- metadados do dataset de treino
+
+Para abrir a interface:
+
+```powershell
+python -m mlflow ui --backend-store-uri ./mlruns
+```
+
+## Documentacao
+
+- Arquitetura: [docs/architecture.md](docs/architecture.md)
+- Monitoramento: [docs/monitoring.md](docs/monitoring.md)
+- Model Card: [docs/model_card.md](docs/model_card.md)
+- ML Canvas: [docs/ml_canvas.md](docs/ml_canvas.md)
+
+## Observacoes
+
+- O backend local do MLflow em filesystem funciona para o desafio, mas pode ser migrado depois para SQLite ou backend remoto.
+- O deploy em nuvem continua como extensao natural para o bonus da entrega.
+
+## Autor
+
+Braian Montoro - Analista de Sistemas | ML Engineer
+
+- GitHub: https://github.com/BraianMontoro/
+- LinkedIn: https://www.linkedin.com/in/braian-montoro-450ba6113/

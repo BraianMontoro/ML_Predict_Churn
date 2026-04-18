@@ -1,163 +1,151 @@
-# 📊 Model Card — Telco Churn Prediction
+# Model Card - Telco Churn Prediction
 
-## 1. Visão Geral
+## 1. Visao Geral
 
-Este modelo foi desenvolvido para prever a probabilidade de cancelamento (churn) de clientes em uma empresa de telecomunicações.
+Este projeto preve a probabilidade de churn de clientes de telecom para apoiar acoes preventivas de retencao.
 
-O objetivo principal é apoiar estratégias de retenção, identificando clientes com maior risco de churn para ações preventivas.
+O repositorio contem dois modelos relevantes:
 
----
+- Regressao Logistica, adotada como baseline de producao
+- MLP em PyTorch, implementada como modelo central do desafio
 
-## 2. Tipo de Modelo
+## 2. Modelos Disponiveis
 
-- Algoritmo: Logistic Regression
-- Biblioteca: Scikit-learn
-- Pipeline: ColumnTransformer + Pipeline
-- Framework de serving: FastAPI
-- Tracking de experimentos: MLflow
+### Logistic Regression
 
----
+- biblioteca: scikit-learn
+- pipeline: `ColumnTransformer + Pipeline`
+- artefato: `models/trained/logistic_pipeline.joblib`
+- uso principal: inferencia padrao via API
+- decisao de classe: regra nativa do estimador
+
+### MLP
+
+- biblioteca: PyTorch
+- arquitetura: `input -> 64 -> 32 -> 1`
+- ativacoes: `ReLU` e `Sigmoid`
+- artefato: `models/trained/mlp_bundle.joblib`
+- uso principal: comparacao tecnica e inferencia opcional via API
+- decisao de classe: threshold configurado em `0.3`
 
 ## 3. Dados Utilizados
 
-- Dataset: Telco Customer Churn
-- Volume: 7043 registros
-- Variáveis: 33 colunas originais
+- dataset: Telco Customer Churn
+- volume: 7043 registros
+- colunas originais: 33
+- target: `churn_value`
 
-### Tipos de features:
-- Demográficas (ex: gender, senior_citizen)
-- Contratuais (ex: contract, tenure_months)
-- Serviços contratados (ex: internet_service, streaming_tv)
-- Financeiras (ex: Monthly Charges, total_charges)
-- Geográficas (ex: country, state, latitude, longitude)
+Principais grupos de variaveis:
 
-### Target:
-- `churn_value` (0 = não cancelou, 1 = cancelou)
-
----
+- demograficas
+- contratuais
+- servicos contratados
+- financeiras
+- geograficas
 
 ## 4. Pipeline de Dados
 
 O pipeline inclui:
 
-- Imputação de valores ausentes:
-  - Numéricas → mediana
-  - Categóricas → mais frequente
-- Encoding:
-  - OneHotEncoder para variáveis categóricas
-- Normalização:
-  - StandardScaler para variáveis numéricas
-- Integração com modelo via Pipeline do Scikit-learn
+- limpeza e padronizacao de colunas
+- tratamento de tipos para `senior_citizen`, `monthly_charges` e `total_charges`
+- validacao tabular com Pandera
+- imputacao de faltantes
+- `OneHotEncoder` para categoricas
+- `StandardScaler` para numericas
 
----
+## 5. Metricas de Referencia
 
-## 5. Métricas do Modelo
+### Logistic Regression
 
-### Validação Cruzada (Stratified K-Fold)
+- accuracy: 0.781
+- precision: 0.602
+- recall: 0.513
+- f1: 0.554
+- auc: 0.827
 
-- AUC média: ~0.83
-- F1-score médio: ~0.57
-- Recall médio: ~0.53
-- Precision média: ~0.61
+### MLP
 
-### Holdout (teste final)
+- accuracy: 0.772
+- precision: 0.557
+- recall: 0.695
+- f1: 0.618
+- auc: 0.841
 
-- Accuracy: ~0.78
-- Precision: ~0.61
-- Recall: ~0.53
-- F1-score: ~0.57
-- AUC: ~0.83
+## 6. Saida da API
 
----
-
-## 6. Interpretação do Modelo
-
-O modelo retorna:
+O contrato de resposta e:
 
 ```json
 {
-  "prediction": 0 ou 1,
-  "churn_probability": valor entre 0 e 1
+  "prediction": 0,
+  "churn_probability": 0.42
 }
-
 ```
 
----
+## 7. Trade-offs de Negocio
 
-## 7. Trade-offs de Negócio
+### Falso Positivo
 
-### Falsos Positivos (FP)
-Cliente identificado como risco, mas não cancelaria.
+Impactos:
 
-Impacto:
-- Ações de retenção desnecessárias
-- Custo operacional
-- Possível concessão de benefícios indevidos
+- acao de retencao desnecessaria
+- custo operacional
+- possivel concessao indevida de beneficio
 
-### Falsos Negativos (FN)
-Cliente em risco não identificado.
+### Falso Negativo
 
-Impacto:
-- Perda de receita
-- Cancelamento não evitado
-- Impacto direto no churn real
+Impactos:
 
-### Estratégia adotada:
-O modelo foi calibrado para equilibrar precisão e recall, com leve foco em recall, visando reduzir perdas de clientes.
+- cliente em risco nao abordado
+- perda de receita recorrente
+- cancelamento nao evitado
 
----
+Por isso, o projeto acompanha recall com atencao especial, mesmo mantendo a Regressao Logistica como opcao principal de producao pela simplicidade operacional.
 
-## 8. Limitações
+## 8. Limitacoes
 
-- O modelo é linear (Logistic Regression), podendo não capturar relações complexas entre variáveis
-- Dependência de qualidade dos dados (ex: `Total Charges`)
-- Features geográficas podem introduzir ruído ou pouca relevância
-- Sensível a mudanças no comportamento do cliente ao longo do tempo (data drift)
-
----
+- a Regressao Logistica nao captura relacoes nao lineares complexas
+- a MLP e mais sensivel a tuning e custo operacional
+- o dataset pode sofrer drift ao longo do tempo
+- a origem dos dados ainda e um arquivo local
 
 ## 9. Riscos e Vieses
 
-- Possível viés geográfico (estado, cidade)
-- Possível viés socioeconômico implícito (via serviços contratados)
-- Dados históricos podem refletir decisões passadas da empresa
-
----
+- vies geograficos por estado, cidade e coordenadas
+- vies socioeconomicos indiretos via servicos e pagamentos
+- dependencia de comportamento historico passado da empresa
 
 ## 10. Monitoramento Recomendado
 
-- Monitorar AUC ao longo do tempo
-- Monitorar taxa de churn real vs previsto
-- Monitorar drift nas features (ex: distribuição de tenure, charges)
-- Re-treinamento periódico recomendado
+- disponibilidade e latencia da API
+- distribuicao das probabilidades previstas
+- taxa de predicoes positivas
+- AUC, recall e precision ao longo do tempo
+- drift das features criticas
 
----
+Detalhamento operacional em [monitoring.md](monitoring.md).
 
 ## 11. Uso Recomendado
 
-- Priorização de campanhas de retenção
-- Segmentação de clientes por risco
-- Apoio à tomada de decisão em marketing e CRM
+- priorizacao de campanhas de retencao
+- apoio a CRM e marketing
+- segmentacao de clientes por risco
 
----
+## 12. Uso Nao Recomendado
 
-## 12. Uso NÃO Recomendado
+- decisao automatica sem validacao humana
+- uso fora do dominio de telecom
+- uso como unica fonte de decisao de negocio
 
-- Decisões automáticas sem validação humana
-- Uso como única fonte de decisão
-- Aplicação fora do domínio de telecom
+## 13. Versao
 
----
+- baseline de producao: `logistic_pipeline.joblib`
+- modelo central do desafio: `mlp_bundle.joblib`
+- versao do projeto: 1.0
+- data de referencia: 2026-04-18
 
-## 13. Versão do Modelo
+## 14. Responsavel
 
-- Nome: logistic_pipeline.joblib
-- Versão: 1.0
-- Data: (preencher com data atual)
-
----
-
-## 14. Contato
-
-Responsável: Braian Montoro  
-Projeto: ML Predict Churn (FIAP Pós-Tech)
+- autor: Braian Montoro
+- projeto: ML Predict Churn

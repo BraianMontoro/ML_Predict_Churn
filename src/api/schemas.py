@@ -35,3 +35,8 @@ class ChurnInput(BaseModel):
     model_config = {
         "populate_by_name": True
     }
+
+
+class PredictionResponse(BaseModel):
+    prediction: int
+    churn_probability: float

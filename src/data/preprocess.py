@@ -22,8 +22,24 @@ def basic_cleaning(df: pd.DataFrame) -> pd.DataFrame:
 
     df = normalize_column_names(df)
 
+    senior_dtype = str(df["senior_citizen"].dtype) if "senior_citizen" in df.columns else None
+    if "senior_citizen" in df.columns and (
+        df["senior_citizen"].dtype == object or senior_dtype == "string"
+    ):
+        normalized = df["senior_citizen"].astype("string").str.strip().str.lower()
+        df["senior_citizen"] = normalized.map({
+            "yes": 1,
+            "no": 0,
+            "1": 1,
+            "0": 0,
+        }).fillna(df["senior_citizen"])
+        df["senior_citizen"] = pd.to_numeric(df["senior_citizen"], errors="coerce")
+
     if "total_charges" in df.columns:
         df["total_charges"] = pd.to_numeric(df["total_charges"], errors="coerce")
+
+    if "monthly_charges" in df.columns:
+        df["monthly_charges"] = pd.to_numeric(df["monthly_charges"], errors="coerce")
 
     return df
 

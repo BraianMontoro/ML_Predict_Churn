@@ -1,132 +1,90 @@
-# 📄 ML Canvas — Previsão de Churn em Telecom
+# ML Canvas - Previsao de Churn em Telecom
 
----
+## 1. Problema de Negocio
 
-## 🎯 1. Objetivo de Negócio
-Reduzir a taxa de cancelamento de clientes (churn), permitindo ações proativas de retenção e aumentando o tempo de vida do cliente (CLTV).
+Uma operadora de telecom precisa reduzir o cancelamento de clientes com acoes de retencao mais precisas e sustentaveis.
 
----
+## 2. Objetivo de Negocio
 
-## 📊 2. Problema de Machine Learning
-Problema de **classificação binária**, onde o objetivo é prever se um cliente irá cancelar o serviço (`Churn = Yes/No`).
+Identificar com antecedencia clientes com alto risco de churn para orientar ofertas, campanhas e atendimento preventivo.
 
----
+## 3. Stakeholders
 
-## 📦 3. Dados Disponíveis
+- diretoria de negocio
+- time de CRM e marketing
+- time de atendimento e retencao
+- engenharia de dados e MLOps
 
-### 📁 Fonte
-Dataset de telecom com **7.043 registros e 33 variáveis**
+## 4. Problema de Machine Learning
 
-### 🔑 Principais grupos de variáveis:
-- **Perfil do cliente:** Gender, Senior Citizen, Partner, Dependents  
-- **Relacionamento:** Tenure Months  
-- **Serviços contratados:** Internet Service, Tech Support, Streaming, etc.  
-- **Financeiro:** Monthly Charges, Total Charges  
-- **Contrato:** Contract, Payment Method, Paperless Billing  
-- **Target:** Churn Label / Churn Value  
+Classificacao binaria para prever se um cliente ira cancelar o servico (`churn_value` igual a `1`) ou permanecer (`0`).
 
----
+## 5. Dados Disponiveis
 
-## 🧹 4. Preparação dos Dados
+- fonte: `data/raw/Telco_customer_churn.xlsx`
+- volume: 7043 registros
+- colunas originais: 33
+- principais grupos: perfil, servicos, relacionamento, contrato, financeiro e geografia
 
-- Tratamento de valores ausentes  
-- Conversão de tipos de dados  
-- Encoding de variáveis categóricas (OneHotEncoder)  
-- Padronização de variáveis numéricas  
-- Pipeline com `ColumnTransformer`  
+## 6. Features Relevantes
 
----
+- relacionamento: `tenure_months`, `partner`, `dependents`
+- servicos: `internet_service`, `tech_support`, `streaming_tv`, `streaming_movies`
+- contrato e pagamento: `contract`, `payment_method`, `paperless_billing`
+- financeiro: `monthly_charges`, `total_charges`
+- contexto geografico: `state`, `city`, `zip_code`
 
-## 🧠 5. Features (Variáveis de Entrada)
+## 7. Saida Esperada
 
-### 📌 Selecionadas:
-- Tenure Months  
-- Monthly Charges  
-- Total Charges  
-- Contract  
-- Internet Service  
-- Tech Support  
-- Payment Method  
-- Partner / Dependents  
+- `prediction`: classe binaria de churn
+- `churn_probability`: probabilidade estimada para apoiar priorizacao
 
-### 💡 Possíveis melhorias futuras:
-- Feature engineering (ex: custo médio por mês)  
-- Segmentação de clientes  
-- Variáveis comportamentais  
+## 8. Metrica Tecnica
 
----
+- principal: AUC-ROC
+- complementares: recall, precision e F1-score
 
-## 🤖 6. Modelos Utilizados
+## 9. Metrica de Negocio
 
-### 🧪 Baselines:
-- DummyClassifier  
-- Logistic Regression  
-- Random Forest  
+- clientes em risco identificados antes do cancelamento
+- churn evitado por campanha
+- custo de retencao por cliente acionado
 
-### 🏆 Modelo escolhido:
-**Logistic Regression**  
-- Melhor equilíbrio entre interpretabilidade e performance  
-- AUC ≈ 0.84  
+## 10. Trade-off de Decisao
 
----
+O projeto privilegia recall para reduzir falsos negativos, pois deixar de abordar um cliente realmente em risco tende a custar mais do que acionar uma oferta desnecessaria para um falso positivo.
 
-## 📏 7. Métricas de Avaliação
+## 11. SLOs Propostos
 
-- AUC-ROC  
-- Precision  
-- Recall  
-- F1-Score  
+- disponibilidade da API acima de 99%
+- latencia p95 do endpoint `/predict` abaixo de 500 ms
+- taxa de erro inferior a 2%
+- suite de testes e lint sempre verdes antes de publicar novos artefatos
 
-### 🎯 Foco principal:
-👉 **Recall (sensibilidade)**  
-Motivo: minimizar falsos negativos (clientes que vão churnar e não foram identificados)
+## 12. Riscos
 
----
+- drift de comportamento de clientes ao longo do tempo
+- vies indiretos em variaveis geograficas e financeiras
+- dependencia de dataset local para reprodutibilidade do treino
 
-## ⚙️ 8. Ajuste de Threshold
+## 13. Solucao Tecnica Escolhida
 
-- Threshold padrão: 0.5  
-- Threshold ajustado: **0.3**
+- baselines com Scikit-Learn para referencia
+- MLP em PyTorch como modelo central do desafio
+- MLflow para rastreamento de experimentos
+- FastAPI para inferencia em tempo real
 
-### 🎯 Objetivo:
-Aumentar recall, mesmo com perda controlada de precisão
+## 14. Estado Atual
 
----
+- EDA concluida em notebook
+- baselines registrados no MLflow
+- MLP treinada com early stopping e batching
+- API funcional com `/health` e `/predict`
+- validacao com Pydantic e Pandera
+- documentacao de arquitetura, monitoramento e Model Card
 
-## 💸 9. Impacto no Negócio
+## 15. Proximos Passos
 
-### ✔ Benefícios:
-- Identificação antecipada de clientes em risco  
-- Redução de churn  
-- Aumento de receita recorrente  
-- Melhor direcionamento de campanhas de retenção  
-
-### ⚠ Riscos:
-- Falsos positivos (clientes que não iriam churnar)  
-- Custo de ações desnecessárias  
-
----
-
-## 🔁 10. Pipeline de ML
-
-- Pipeline reprodutível com Scikit-Learn  
-- Separação treino/teste  
-- Validação cruzada estratificada  
-- Registro de experimentos com MLflow  
-
----
-
-## 🚀 11. Próximos Passos
-
-- Implementar modelo de **Rede Neural (MLP com PyTorch)**  
-- Comparar performance com baseline  
-- Criar API de inferência com FastAPI  
-- Implementar testes automatizados  
-- Construir Model Card  
-- Monitoramento de modelo (drift e performance)  
-
----
-
-## 📌 12. Considerações Finais
-
-O modelo atual apresenta boa capacidade preditiva e já permite aplicação prática no negócio. A evolução com redes neurais e melhorias no pipeline tende a aumentar ainda mais a performance e robustez da solução.
+- gravar o video STAR de 5 minutos
+- opcionalmente publicar a API em nuvem para o bonus da entrega
+- migrar o backend local do MLflow para SQLite em uma evolucao futura
