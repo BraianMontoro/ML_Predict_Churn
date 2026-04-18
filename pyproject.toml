@@ -17,6 +17,7 @@ dependencies = [
     "openpyxl",
     "scikit-learn",
     "fastapi",
+    "gunicorn",
     "uvicorn",
     "pydantic",
     "pandera"
