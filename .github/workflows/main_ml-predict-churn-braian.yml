@@ -40,6 +40,5 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: "ml-predict-churn-braian"
-          slot-name: "production"
           publish-profile: ${{ secrets.AzureAppService_PublishProfile_4ee3ded2642b465fbd392446d375f0d2 }}
           package: .
