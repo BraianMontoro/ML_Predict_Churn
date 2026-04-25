@@ -1,1 +1,1 @@
--e .
+-e .[serve-mlp]

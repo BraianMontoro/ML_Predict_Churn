@@ -120,7 +120,7 @@ O `pyproject.toml` e a fonte canonica de dependencias, lint e configuracao de te
 
 Arquivos auxiliares:
 
-- `requirements.txt`: runtime enxuto da API
+- `requirements.txt`: runtime da API em producao, incluindo suporte a inferencia com MLP
 - `requirements-dev.txt`: instalacao local com extras de treino e desenvolvimento
 
 ## Comandos Principais
@@ -253,8 +253,8 @@ python -m mlflow ui --backend-store-uri ./mlruns
 
 - O backend local do MLflow em filesystem funciona para o desafio, mas pode ser migrado depois para SQLite ou backend remoto.
 - O deploy em nuvem continua como extensao natural para o bonus da entrega.
-- Para deploy da API em App Service, `requirements.txt` instala o runtime da aplicacao via `pyproject.toml`.
-- O endpoint `/predict` em nuvem exige que o arquivo `models/trained/logistic_pipeline.joblib` esteja versionado no repositorio.
+- Para deploy da API em App Service, `requirements.txt` instala o runtime da aplicacao via `pyproject.toml`, incluindo o extra `serve-mlp`.
+- O endpoint `/predict` em nuvem exige que os arquivos `models/trained/logistic_pipeline.joblib` e `models/trained/mlp_bundle.joblib` estejam versionados no repositorio.
 
 ## Autor
 

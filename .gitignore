@@ -33,6 +33,7 @@ models/trained/*
 models/artifacts/*
 !models/trained/
 !models/trained/logistic_pipeline.joblib
+!models/trained/mlp_bundle.joblib
 
 # -------------------------
 # Data (NÃO VERSIONAR)
