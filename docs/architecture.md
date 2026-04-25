@@ -42,6 +42,12 @@ O fluxo principal e:
 
 A API utiliza FastAPI em modo real-time.
 
+### Ambientes de execucao
+
+- ambiente local: `http://127.0.0.1:8000`
+- ambiente publico Azure App Service: `https://ml-predict-churn-braian.azurewebsites.net`
+- Swagger publico: `https://ml-predict-churn-braian.azurewebsites.net/docs#/`
+
 ### Endpoints
 
 - `GET /health`: verifica disponibilidade da aplicacao
@@ -56,6 +62,12 @@ A API utiliza FastAPI em modo real-time.
 
 - Logging estruturado com `logging`
 - Middleware de latencia adicionando o header `X-Process-Time-Ms`
+
+### Publicacao em nuvem
+
+- deploy em Azure App Service
+- pipeline automatizado por GitHub Actions em `push` para `main`
+- artefatos exigidos em producao: `models/trained/logistic_pipeline.joblib` e `models/trained/mlp_bundle.joblib`
 
 ## 5. Decisao de Deploy: Real-time vs Batch
 
@@ -99,4 +111,4 @@ Nesse caso, o mesmo modelo poderia ser reutilizado em uma rotina agendada separa
 - adicionar pipeline batch agendado
 - expor metricas para Prometheus
 - containerizar a API com Docker
-- publicar a API em nuvem como bonus da entrega
+- adicionar monitoramento gerenciado no ambiente Azure

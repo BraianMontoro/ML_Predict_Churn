@@ -83,6 +83,13 @@ O contrato de resposta e:
 }
 ```
 
+### Acesso da API
+
+- Swagger publico: `https://ml-predict-churn-braian.azurewebsites.net/docs#/`
+- Health check publico: `https://ml-predict-churn-braian.azurewebsites.net/health`
+- inferencia default: `POST /predict`
+- inferencia com MLP: `POST /predict?model_name=mlp`
+
 ## 7. Trade-offs de Negocio
 
 ### Falso Positivo
@@ -131,6 +138,7 @@ Detalhamento operacional em [monitoring.md](monitoring.md).
 - priorizacao de campanhas de retencao
 - apoio a CRM e marketing
 - segmentacao de clientes por risco
+- testes manuais e demonstracao via Swagger publicado na Azure
 
 ## 12. Uso Nao Recomendado
 

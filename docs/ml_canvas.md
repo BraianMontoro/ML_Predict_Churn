@@ -80,11 +80,12 @@ O projeto privilegia recall para reduzir falsos negativos, pois deixar de aborda
 - baselines registrados no MLflow
 - MLP treinada com early stopping e batching
 - API funcional com `/health` e `/predict`
+- API publicada no Azure App Service com Swagger em `https://ml-predict-churn-braian.azurewebsites.net/docs#/`
 - validacao com Pydantic e Pandera
 - documentacao de arquitetura, monitoramento e Model Card
 
 ## 15. Proximos Passos
 
 - gravar o video STAR de 5 minutos
-- opcionalmente publicar a API em nuvem para o bonus da entrega
+- fortalecer monitoramento e operacao do deploy em nuvem
 - migrar o backend local do MLflow para SQLite em uma evolucao futura

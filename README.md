@@ -181,6 +181,22 @@ Suba a API com:
 python -m uvicorn src.api.main:app --reload
 ```
 
+### Acesso local
+
+- Base URL local: `http://127.0.0.1:8000`
+- Swagger local: `http://127.0.0.1:8000/docs`
+
+### Acesso publico na Azure
+
+- Base URL publica: `https://ml-predict-churn-braian.azurewebsites.net`
+- Swagger publico: `https://ml-predict-churn-braian.azurewebsites.net/docs#/`
+- Health check publico: `https://ml-predict-churn-braian.azurewebsites.net/health`
+
+Observacao:
+
+- no deploy da Azure, nao use `/8000` na URL publica
+- a porta `8000` e apenas a referencia local do servidor durante desenvolvimento
+
 ### Endpoints
 
 - `GET /health`
@@ -191,6 +207,134 @@ python -m uvicorn src.api.main:app --reload
 Todas as respostas incluem:
 
 - `X-Process-Time-Ms`
+
+### Como testar a API
+
+#### 1. Teste rapido no navegador
+
+Abra:
+
+- `http://127.0.0.1:8000/docs` localmente
+- `https://ml-predict-churn-braian.azurewebsites.net/docs#/` em producao
+
+Para validar a saude da API:
+
+- `http://127.0.0.1:8000/health`
+- `https://ml-predict-churn-braian.azurewebsites.net/health`
+
+Resposta esperada:
+
+```json
+{"status":"ok"}
+```
+
+#### 2. Teste interativo no Swagger
+
+No Swagger:
+
+1. abra `POST /predict`
+2. clique em `Try it out`
+3. cole um payload valido
+4. execute com `model_name=logistic` ou `model_name=mlp`
+
+Payload de exemplo:
+
+```json
+{
+  "count": 1,
+  "country": "United States",
+  "state": "California",
+  "city": "Los Angeles",
+  "zip_code": "90001",
+  "lat_long": "33.973616, -118.24902",
+  "latitude": 33.973616,
+  "longitude": -118.24902,
+  "gender": "Male",
+  "senior_citizen": 0,
+  "partner": "Yes",
+  "dependents": "No",
+  "tenure_months": 12,
+  "phone_service": "Yes",
+  "multiple_lines": "No",
+  "internet_service": "Fiber optic",
+  "online_security": "No",
+  "online_backup": "Yes",
+  "device_protection": "No",
+  "tech_support": "No",
+  "streaming_tv": "Yes",
+  "streaming_movies": "Yes",
+  "contract": "Month-to-month",
+  "paperless_billing": "Yes",
+  "payment_method": "Electronic check",
+  "Monthly Charges": 79.9,
+  "total_charges": 958.8
+}
+```
+
+#### 3. Teste via PowerShell
+
+Monte o corpo da requisicao:
+
+```powershell
+$body = @{
+  count = 1
+  country = "United States"
+  state = "California"
+  city = "Los Angeles"
+  zip_code = "90001"
+  lat_long = "33.973616, -118.24902"
+  latitude = 33.973616
+  longitude = -118.24902
+  gender = "Male"
+  senior_citizen = 0
+  partner = "Yes"
+  dependents = "No"
+  tenure_months = 12
+  phone_service = "Yes"
+  multiple_lines = "No"
+  internet_service = "Fiber optic"
+  online_security = "No"
+  online_backup = "Yes"
+  device_protection = "No"
+  tech_support = "No"
+  streaming_tv = "Yes"
+  streaming_movies = "Yes"
+  contract = "Month-to-month"
+  paperless_billing = "Yes"
+  payment_method = "Electronic check"
+  "Monthly Charges" = 79.9
+  total_charges = 958.8
+} | ConvertTo-Json
+```
+
+Teste do baseline logistico em producao:
+
+```powershell
+Invoke-RestMethod `
+  -Uri "https://ml-predict-churn-braian.azurewebsites.net/predict" `
+  -Method Post `
+  -ContentType "application/json" `
+  -Body $body
+```
+
+Teste da MLP em producao:
+
+```powershell
+Invoke-RestMethod `
+  -Uri "https://ml-predict-churn-braian.azurewebsites.net/predict?model_name=mlp" `
+  -Method Post `
+  -ContentType "application/json" `
+  -Body $body
+```
+
+Saida esperada:
+
+```json
+{
+  "prediction": 0,
+  "churn_probability": 0.42
+}
+```
 
 ### Exemplo de inferencia com o baseline logistico
 
@@ -211,7 +355,7 @@ curl -X POST "http://127.0.0.1:8000/predict?model_name=mlp" ^
 Observacao:
 
 - a rota `model_name=mlp` exige que o artefato `models/trained/mlp_bundle.joblib` exista no ambiente
-- no repositorio versionado, o artefato garantido para inferencia imediata e o baseline logistico
+- em producao, os artefatos `logistic_pipeline.joblib` e `mlp_bundle.joblib` devem estar presentes
 
 ## Qualidade e Validacao
 
@@ -252,9 +396,10 @@ python -m mlflow ui --backend-store-uri ./mlruns
 ## Observacoes
 
 - O backend local do MLflow em filesystem funciona para o desafio, mas pode ser migrado depois para SQLite ou backend remoto.
-- O deploy em nuvem continua como extensao natural para o bonus da entrega.
+- A API esta publicada no Azure App Service.
 - Para deploy da API em App Service, `requirements.txt` instala o runtime da aplicacao via `pyproject.toml`, incluindo o extra `serve-mlp`.
 - O endpoint `/predict` em nuvem exige que os arquivos `models/trained/logistic_pipeline.joblib` e `models/trained/mlp_bundle.joblib` estejam versionados no repositorio.
+- O deploy em producao acontece automaticamente a cada `push` na branch `main` via GitHub Actions.
 
 ## Autor
 

@@ -9,6 +9,7 @@ Garantir que a API e os modelos continuem confiaveis apos a entrega, acompanhand
 ### Saude da API
 
 - disponibilidade do endpoint `/health`
+- disponibilidade do Swagger em `/docs#/`
 - latencia media e percentis do endpoint `/predict`
 - taxa de erro HTTP 4xx e 5xx
 
@@ -53,10 +54,11 @@ Monitorar mudancas de distribuicao em:
 ### Incidente de API
 
 1. Verificar se o `/health` responde.
-2. Conferir logs da aplicacao.
-3. Identificar se o problema esta no carregamento do modelo ou no payload.
-4. Reiniciar o servico se necessario.
-5. Registrar causa raiz.
+2. Confirmar se o Swagger abre em `https://ml-predict-churn-braian.azurewebsites.net/docs#/`.
+3. Conferir logs da aplicacao.
+4. Identificar se o problema esta no carregamento do modelo ou no payload.
+5. Reiniciar o servico se necessario.
+6. Registrar causa raiz.
 
 ### Incidente de latencia
 
@@ -64,6 +66,13 @@ Monitorar mudancas de distribuicao em:
 2. Comparar latencia por modelo (`logistic` vs `mlp`).
 3. Inspecionar carga da maquina e I/O do disco.
 4. Se necessario, priorizar temporariamente o baseline logistico.
+
+### Incidente especifico da MLP
+
+1. Confirmar se `models/trained/mlp_bundle.joblib` esta presente no deploy.
+2. Confirmar se o runtime contem `torch`.
+3. Reexecutar `POST /predict?model_name=mlp` com payload valido.
+4. Validar a stack trace nos logs da aplicacao.
 
 ### Incidente de drift
 
@@ -93,3 +102,4 @@ Monitorar mudancas de distribuicao em:
 - registrar todos os treinos no MLflow
 - repetir a suite de testes antes de trocar artefatos
 - revisar o Model Card a cada nova versao promovida
+- validar `health`, `docs` e `predict` apos cada deploy em producao
