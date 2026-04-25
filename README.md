@@ -80,6 +80,10 @@ A MLP foi industrializada no projeto por ser o modelo central exigido pelo desaf
 
 O projeto utiliza o dataset Telco Customer Churn em formato Excel.
 
+Link para download do dataset:
+
+- https://www.kaggle.com/datasets/yeanzc/telco-customer-churn-ibm-dataset?resource=download
+
 Para reproduzir o treino do zero:
 
 1. obtenha o arquivo `Telco_customer_churn.xlsx`
