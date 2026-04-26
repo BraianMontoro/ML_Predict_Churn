@@ -1,6 +1,7 @@
 import copy
 import logging
 import random
+from functools import lru_cache
 from pathlib import Path
 
 import joblib
@@ -178,6 +179,7 @@ def save_mlp_bundle(
     joblib.dump(bundle, bundle_path)
 
 
+@lru_cache(maxsize=1)
 def load_mlp_bundle(bundle_path: Path) -> dict:
     logger.info("Carregando bundle da MLP em: %s", bundle_path)
     if not bundle_path.exists():
@@ -187,6 +189,7 @@ def load_mlp_bundle(bundle_path: Path) -> dict:
     return joblib.load(bundle_path)
 
 
+@lru_cache(maxsize=1)
 def load_mlp_model(bundle_path: Path) -> tuple[dict, ChurnMLP]:
     bundle = load_mlp_bundle(bundle_path)
     model = ChurnMLP(

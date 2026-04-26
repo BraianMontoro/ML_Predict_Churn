@@ -1,4 +1,5 @@
 import logging
+from functools import lru_cache
 
 import joblib
 import pandas as pd
@@ -13,6 +14,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+@lru_cache(maxsize=1)
 def load_logistic_model():
     logger.info("Carregando modelo salvo em: %s", LOGISTIC_MODEL_PATH)
     if not LOGISTIC_MODEL_PATH.exists():
